@@ -5,12 +5,6 @@ import sharp from "sharp";
 import fs from "fs";
 import { encrypt } from "node-qpdf2";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const images = formData.getAll("images") as File[];

@@ -17,6 +17,7 @@ import { securePdfFormSchema } from "@/schema";
 import { z } from "zod";
 
 const ConvertToPdf = () => {
+  console.log("reached convertopdf route");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isConvertingWithoutPassword, setIsConvertingWithoutPassword] =
@@ -35,8 +36,9 @@ const ConvertToPdf = () => {
   }, [router, files]);
 
   const handleAddImageClick = () => {
-    console.log("add image clicked");
-    fileInputRef.current?.click();
+    if (!isConvertingWithoutPassword && !isConvertingWithPassword) {
+      fileInputRef.current?.click();
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +68,9 @@ const ConvertToPdf = () => {
     const formData = new FormData();
     files.forEach((file, index) => {
       if (index === 0) {
-        firstPdfFileName.current = file.name.split(".")[0];
+        firstPdfFileName.current = isSecured
+          ? file.name.split(".")[0] + "_secured"
+          : file.name.split(".")[0];
       }
       formData.append("images", file);
     });
@@ -90,11 +94,16 @@ const ConvertToPdf = () => {
     setIsConvertingWithPassword(false);
   };
 
+  const handleBackToHomeClick = () => {
+    setFiles([]);
+    router.push("/");
+  };
+
   return (
     <div className="mt-4">
       <div
         className="bg-gray-300 hover:bg-gray-500 rounded-full p-3 w-12 cursor-pointer ml-6"
-        onClick={() => router.push("/")}
+        onClick={handleBackToHomeClick}
       >
         <IoArrowBack size={24} color="black" />
       </div>
@@ -104,7 +113,11 @@ const ConvertToPdf = () => {
         ))}
         {/* plus icon adding new file */}
         <div
-          className="flex justify-center flex-col items-center border border-gray-400 rounded-full px-8 py-10 mx-4 bg-gray-300 cursor-pointer"
+          className={`flex justify-center flex-col items-center self-center border border-gray-400 rounded-full px-8 py-10 mx-4 bg-gray-300 ${
+            isConvertingWithoutPassword || isConvertingWithPassword
+              ? "cursor-not-allowed"
+              : "cursor-pointer"
+          }`}
           onClick={handleAddImageClick}
         >
           <CiCirclePlus size={24} color="black" />
@@ -126,7 +139,7 @@ const ConvertToPdf = () => {
             <Button
               className="px-4 py-2 mx-5 text-white bg-red-500 rounded hover:bg-red-600"
               onClick={() => handleConvertToPdf(false)}
-              disabled={isConvertingWithoutPassword}
+              disabled={isConvertingWithoutPassword || isConvertingWithPassword}
             >
               <span className="mx-2">
                 <HiLockOpen size={20} color="white" />
@@ -141,7 +154,7 @@ const ConvertToPdf = () => {
             <Button
               className="px-4 py-2 mx-5 text-white bg-green-500 rounded hover:bg-green-600"
               onClick={handleConvertToPdfWithPassword}
-              disabled={isConvertingWithPassword}
+              disabled={isConvertingWithPassword || isConvertingWithoutPassword}
             >
               <span className="mx-2">
                 <HiLockClosed size={20} color="white" />

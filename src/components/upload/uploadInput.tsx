@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 const UploadInput = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { setFiles } = useFileContext();
+  const { setFiles, files } = useFileContext();
   const router = useRouter();
   
   const handleButtonClick = () => {
@@ -23,6 +23,7 @@ const UploadInput = () => {
     if (selectedFiles) {
       const fileArray = Array.from(selectedFiles);
       setFiles(fileArray);
+      console.log("routing started from uploadInput");
       router.push("/images-to-pdf");
     }
   };
@@ -31,6 +32,7 @@ const UploadInput = () => {
       <Button
         className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
         onClick={handleButtonClick}
+        disabled={files.length > 0}
       >
         <span className="mx-2">
           <FaFileUpload color="white" size={20} />

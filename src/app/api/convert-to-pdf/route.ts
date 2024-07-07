@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
